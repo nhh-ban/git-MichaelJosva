@@ -4,6 +4,8 @@
 
 # More detailed steps to complete Problem 1.
 
+setwd("/Users/michaeljosvawoldikechristensen/Desktop/Master_NHH/R_programming_for_Data_Science/Git_R_programmering/mj_assignment1/git-MichaelJosva")
+
 library(tidyverse)    # Contains most of what we need.
 
 # Read the entire data file into memory using the readLines()-function. Use the
@@ -16,10 +18,12 @@ library(tidyverse)    # Contains most of what we need.
 # the file does not end with an "end of line"-character (EOL). This does not
 # seem to pose a problem later, and it seems that we can silece the warning by
 # switchin off the "warn"-argument. Do that if you wish.
-raw_file <- readLines(con = "?")
+raw_file <- readLines(con = "suites_dw_Table1.txt")
 
 # Identify the line number L of the separator line between the column names and
 # the rest of the data table.
+
+Line_L <- 14
 
 # Now every line in the file is in its separate element in the character vector
 # "raw_file". The next key step is to identify which line contains the separator
@@ -31,15 +35,21 @@ raw_file <- readLines(con = "?")
 
 # What do you need to replace the two question marks with in order to extract
 # the first two letters?
-substr(x = raw_file, start = ?, stop = ?)
-
+Lines <- substr(x = raw_file, start = 1, stop = 2)
+Lines
 # The next step is then to find out *which* line starts with "--", and pick out
 # the first one. This can be done in a nice little pipe, where you have to fill
 # out the question marks and the missing function names:
-L <- 
-  (substr(x = raw_file, start = ?, stop = ?) == "?") %>% 
-  function_that_returns_the_index_of_all_TRUES %>% 
-  function_that_picks_out_the_minimum_value
+# L <- 
+#  (substr(x = raw_file, start = 1, stop = 3) == "--") %>% 
+#  function_that_returns_the_index_of_all_TRUES %>% 
+#  function_that_picks_out_the_minimum_value
+
+L <- (substr(x = raw_file, start = 1, stop = 2) == "--") %>%  # generates TRUE/FALSE list
+        which() %>% # print index of TRUES
+        min() # selects minimum index (the first position)
+  
+
 
 # Save the variable descriptions (i.e. the information in lines 1:(L-2)) in a
 # text-file for future reference using the cat()-function. The first argument is
@@ -47,13 +57,19 @@ L <-
 # "raw_file"-vector on a separate line we also provide the sep-argument, where
 # we put the "end-of-line"-character "\n". We also need to come up with a file
 # name. Replace the question marks:
-cat(?, sep = "\n", file = "?")
+# cat(?, sep = "\n", file = "?")
+
+cat(raw_file[1:(L-2)], sep = "\n", file = "descriptions")
+
+cat(raw_file[(L+1):length(raw_file)], sep = "\n", file = "data")
+
 
 # Extract the variable names (i.e. line (L-1)), store the names in a vector.
 
 # This is a little bit dirty. We want to *split* the string in raw_data[L-1]
 # *by* the character "|", and then we want to *trim* away all the leading and
-# trailing white spaces. The first step can be accomplished using the
+# trailing white spaces. 
+# The first step can be accomplished using the
 # str_split()-function in the stringr-package (this is already loaded through
 # tidyverse), but there is a delicate detail here. The "|"-character has special
 # meaning in R ("or"), so it must be *escaped*, meaning that we tell R that it
@@ -64,9 +80,14 @@ cat(?, sep = "\n", file = "?")
 # apply the str_trim()-function (also in the stringr-package) to get rid of all
 # the empty space. Replace the question mark below:
 variable_names <- 
-  str_split(string = ?, pattern = "\\|") %>% 
+  str_split(string = raw_file[L-1], pattern = "\\|") %>% 
   unlist() %>% 
   str_trim()
+
+variable_names # for inspection
+
+vnames <- paste(variable_names)
+vnames
 
 # Read the data. One way to do this is to rewrite the data to a new .csv-file
 # with comma-separators for instance using cat() again, with the variable names
@@ -79,9 +100,11 @@ variable_names <-
 # super for this kind of search-and-replace. Replace the question mark below.
 
 comma_separated_values <- 
-  ? %>% 
+  raw_file[L+1:length(raw_file)] %>% 
   gsub("\\|", ",", .) %>% 
   gsub(" ", "", .)
+
+comma_separated_values
 
 # We then just add the variable names (separated with commas) on top, and
 # cat()-the whole ting to a .csv-file in the same way as we did with the
@@ -91,16 +114,21 @@ comma_separated_values_with_names <-
   c(paste(variable_names, collapse = ","),
     comma_separated_values)    
 
+comma_separated_values_with_names
+
 # Replace the question mark and come up with a file name
-cat(?, sep = "\n", file = "?")
+cat(comma_separated_values_with_names, sep = "\n", file = "raw_file_edit.csv")
 
 # Read the file back in as a normal csv-file. The readr-package is part of
 # tidyverse, so it is already loaded.
-galaxies <- read_csv("?")
-
+galaxies <- read_csv("raw_file_edit.csv")
+summary(galaxies)
+tail(galaxies)
+head(galaxies)
 
 # You should now have a nice, clean data frame with galaxies and their
 # characteristics in memory. As of March 2022 it should contain 796
 # observations.
+
 
 
